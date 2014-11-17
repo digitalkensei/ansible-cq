@@ -3,11 +3,15 @@ ansible-cq
 
 Adobe CQ Deployment automation with Ansible.
 
+vars: 
+ - user: // cq admin user 
+ - password // cq admin password 
+ - wesips // WES ip adresses (iptables) 
+ - cqport // Adobe CQ Port, 4502 autor and 4503 publish. 
+ - cqpath // /opt/cq/ autor or publish 
 
-Playbooks:
--Releases
---9.4.1
-  pub.yml
-  auth.yml
 
-Roles:
+We automated the manual deployments with the following technologies: 
+- Ansible 
+- Jenkins 
+- Nexus
