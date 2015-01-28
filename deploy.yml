@@ -1,0 +1,92 @@
+---
+
+# LATEST DEPLOYMENT
+# ===========================
+
+- name: Nightly Deliver Deployment (LATEST)
+  hosts: AWI_Development
+  user: asrun
+  max_fail_percentage: 0
+  serial: 1
+
+  tasks:
+# 01. Define Iptables --------------------------------------------------------------------------------------------
+  - name:Define Iptables
+   command: sudo iptables {{wes_ips}}
+
+# 02. Delete CRX objects -----------------------------------------------------------------------------------------
+  - name: Delete CRX Mappings
+    command: curl -X DELETE http://localhost:{{cqport}}/etc/map -u {{username}}:{{password}}
+
+  - name: Delete CRX Dev Mappings
+    command: curl -X DELETE http://localhost:{{cqport}}/etc/map-test -u {{username}}:{{password}}
+
+  - name: Delete CRX Int Mappings
+    command: curl -X DELETE http://localhost:{{cqport}}/etc/map-int -u {{username}}:{{password}}
+
+  - name: Delete CRX Mappings Global
+    command: curl -X DELETE http://localhost:{{cqport}}/apps/global -u {{username}}:{{password}}
+
+  - name: Delete CRX Mappings Launcher 
+    command: curl -X DELETE http://localhost:{{cqport}}/etc/workflow/launcher -u {{username}}:{{password}}
+
+  - name: Delete CRX Mappings Models
+    command: curl -X DELETE http://localhost:{{cqport}}/etc/workflow/models -u {{username}}:{{password}}
+
+# 03. Remove Folder on Server -----------------------------------------------------------------------------------
+  - name: Remove Jjamardo folder
+    shell: rm -rf /opt/daycq/{{cqpath}}/crx-quickstart/launchpad/config/com/jjamardo
+
+  - name: Remove Impl folder
+    shell: rm -rf /opt/daycq/{{cqpath}}/crx-quickstart/launchpad/config/com/day/cq/rewriter/linkchecker/impl
+
+# 04. Remove old CQ packages ------------------------------------------------------------------------------------
+  - name: Remove old all-components package
+    command: curl -u {{username}}:{{password}} -F name=all-components http://localhost:{{cqport}}/crx/packmgr/service.jsp?cmd=rm
+
+  - name: Remove old jjamardo-components package
+    command: curl -u {{username}}:{{password}} -F name=jjamardo-components http://localhost:{{cqport}}/crx/packmgr/service.jsp?cmd=rm
+
+# 05. Copy new packages to /opt/daycq/tmp/ -----------------------------------------------------------------------
+  - name: Copy new all-components.zip
+    command: wget -O /opt/daycq/tmp/all-components.zip http://repo.jjamardo.com/service/local/artifact/maven/redirect?r=hosted.wcms.snapshots\&g=com.jjamardo.cq.wcms\&a=all-components\&v=LATEST
+
+  - name: Copy new jjamardo-components.zip
+    command: wget -O /opt/daycq/tmp/jjamardo-components.zip http://repo.jjamardo.com/service/local/artifact/maven/redirect?r=hosted.wcms.snapshots\&g=com.jjamardo.cq.wcms\&a=jjamardo-components\&v=LATEST
+
+# 06. Upload new packages into CRX ------------------------------------------------------------------------------
+  - name: Upload the new all-components.zip on Publisher
+    shell: curl -u {{username}}:{{password}} -F package=@"/opt/daycq/tmp/all-components.zip" http://localhost:{{cqport}}/crx/packmgr/service/.json/?cmd=upload
+
+  - name: Upload the new jjamardo-components.zip on Publisher
+    shell: curl -u {{username}}:{{password}} -F package=@"/opt/daycq/tmp/jjamardo-components.zip" http://localhost:{{cqport}}/crx/packmgr/service/.json/?cmd=upload
+
+# 07. Install new packages ---------------------------------------------------------------------------------------
+  - name: Install all-components.zip on Publisher
+    command: curl -u {{username}}:{{password}} -F file=@"/opt/daycq/tmp/all-components.zip" -F name="all-components" -F force=true -F install=true http://localhost:{{cqport}}/crx/packmgr/service.jsp
+
+  - name: Install new jjamardo-components.zip on Publisher
+    command: curl -u {{username}}:{{password}} -F file=@"/opt/daycq/tmp/jjamardo-components.zip" -F name="jjamardo-components" -F force=true -F install=true http://localhost:{{cqport}}/crx/packmgr/service.jsp
+
+# 08. Final Tasks (delete jsps, CQ stop, delete dispatcher cache, CQ start) --------------------------------------
+  - name: Delete precompiled jsps on Publisher
+    command: curl -X DELETE http://localhost:{{cqport}}/var/classes/org/apache/jsp/apps/ -u {{username}}:{{password}}   
+
+  - name: Clean Dispatcher Cache on Publisher
+    shell: rm -rf /opt/daycq/dispatcher/cache/publish*/*
+
+  - name: make sure CQ is stopped
+    service:  name=cq state=stopped
+
+  - name: Pause for 2 minutes
+    pause: minutes=2
+
+  - name: make sure CQ is started
+    service:  name=cq state=started
+
+# 09. Automatic Testing ----------------------------------------------------------------------------------------------------
+#tbd
+
+# 10. Remove Iptables 
+  - name:Define Iptables
+    command: sudo iptables -F
