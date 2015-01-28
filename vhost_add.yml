@@ -1,0 +1,31 @@
+---
+
+# File: vhost_add.yml
+# Part: Apache
+#
+# Description: Create a new virtual host 
+#
+# Parameters: 
+# - {{ project }} : absolute docroot path 
+# - {{ vhost }} : virtualhost name 
+# ===========================
+
+- name: Add new VirtualHost
+  hosts: AWI_Development_Publish
+  user: asrun
+
+  tasks:
+
+  - name: Create DocumentRoot directory
+    file: path=/opt/cq/dispatcher/cache/{{ project }} state=directory owner=asrun group=asrun mode=0775
+
+  - name: Create VirtualHost entry 
+    template:
+      src=/var/lib/awx/templates/virtualhost.j2
+      dest=/etc/httpd/sites-available/{{ vhost }}.conf
+
+  - name: Enable Virtualhost entry 
+    command: /usr/local/bin/enable-site {{ vhost }}
+
+  - name: Apache restart
+    command: sudo /etc/init.d/httpd restart
