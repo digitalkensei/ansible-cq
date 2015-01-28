@@ -1,0 +1,41 @@
+# --------------------{ {{ vhost }} }--------------------
+<VirtualHost *:80>
+  ServerName {{ vhost }}
+  DocumentRoot /opt/cq/dispatcher/cache/{{ project }}
+  ErrorLog /opt/cq/logs/httpd/{{ project }}-error.log
+  CustomLog /opt/cq/logs/httpd/{{ project }}-access.log combined
+  RequestHeader set Host {{ vhost }}
+
+    <IfModule disp_apache2.c>
+                SetHandler dispatcher-handler
+    </IfModule>
+
+  Include /opt/cq/dispatcher/conf/error-global.conf
+
+ <Directory /opt/cq/dispatcher/cache/{{ project }}>
+    Include /opt/cq/dispatcher/conf/directory.conf
+  </Directory>
+
+</VirtualHost>
+
+
+# --------------------{ DirectAccess - {{ vhost }} }--------------------
+<VirtualHost *:80>
+  ServerName {{type}}{{ vhost }}
+  DocumentRoot /opt/cq/dispatcher/cache/{{project}}
+  ErrorLog /opt/cq/logs/httpd/{{ project }}-error.log
+  CustomLog /opt/cq/logs/httpd/{{ project }}-access.log combined
+  RequestHeader set Host {{ vhost }}
+
+    <IfModule disp_apache2.c>
+                SetHandler dispatcher-handler
+    </IfModule>
+
+  Include /opt/daycq/dispatcher/conf/error-global.conf
+
+
+ <Directory /opt/cq/dispatcher/cache/{{ project }}>
+    Include /opt/cq/dispatcher/conf/directory.conf
+  </Directory>
+
+</VirtualHost>
