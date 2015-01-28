@@ -12,7 +12,7 @@
   tasks:
 # 01. Define Iptables --------------------------------------------------------------------------------------------
   - name:Define Iptables
-   command: sudo iptables {{wes_ips}}
+    command: sudo iptables {{wes_ips}}
 
 # 02. Delete CRX objects -----------------------------------------------------------------------------------------
   - name: Delete CRX Mappings
