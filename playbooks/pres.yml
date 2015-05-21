@@ -78,7 +78,7 @@
     command:  echo hello world!
 
   - name: Pause for 2 minutes
-    command: seconds=10
+    pause: minutes=1
 
   - name: make sure CQ is started
     command:  echo hello world!
