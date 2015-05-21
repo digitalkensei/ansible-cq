@@ -21,7 +21,7 @@
     command: echo hello world!
 
   - name: Delete CRX Int Mappings
-    command: cecho hello world!
+    command: echo hello world!
 
   - name: Delete CRX Mappings Global
     command: echo hello world!
