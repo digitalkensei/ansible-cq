@@ -10,7 +10,7 @@
 
   tasks:
 # 01. Define Iptables --------------------------------------------------------------------------------------------
-  - name:Define Iptables
+  - name: Define Iptables
     command: echo hello world!
 
 # 02. Delete CRX objects -----------------------------------------------------------------------------------------
