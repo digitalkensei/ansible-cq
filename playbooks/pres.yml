@@ -1,0 +1,91 @@
+---
+
+# THESIS DEPLOYMENT
+# ===========================
+
+#- name: Thesis
+#  hosts: AWI_Development
+#  user: asrun
+#  max_fail_percentage: 0
+
+  tasks:
+# 01. Define Iptables --------------------------------------------------------------------------------------------
+  - name:Define Iptables
+    local_action: echo hello world!
+
+# 02. Delete CRX objects -----------------------------------------------------------------------------------------
+  - name: Delete CRX Mappings
+    local_action: echo hello world!
+
+  - name: Delete CRX Dev Mappings
+    local_action: echo hello world!
+
+  - name: Delete CRX Int Mappings
+    local_action: cecho hello world!
+
+  - name: Delete CRX Mappings Global
+    local_action: echo hello world!
+
+  - name: Delete CRX Mappings Launcher 
+    local_action: echo hello world!
+
+  - name: Delete CRX Mappings Models
+    local_action: echo hello world!
+
+# 03. Remove Folder on Server -----------------------------------------------------------------------------------
+  - name: Remove Jjamardo folder
+    local_action: echo hello world!
+
+  - name: Remove Impl folder
+    local_action: echo hello world!
+
+# 04. Remove old CQ packages ------------------------------------------------------------------------------------
+  - name: Remove old all-components package
+    local_action: echo hello world!
+
+  - name: Remove old jjamardo-components package
+    local_action: echo hello world!
+
+# 05. Copy new packages to /opt/cq/tmp/ -----------------------------------------------------------------------
+  - name: Copy new all-components.zip
+    local_action: echo hello world!
+
+  - name: Copy new jjamardo-components.zip
+    local_action: echo hello world!
+
+# 06. Upload new packages into CRX ------------------------------------------------------------------------------
+  - name: Upload the new all-components.zip on Publisher
+    local_action: echo hello world!
+
+  - name: Upload the new jjamardo-components.zip on Publisher
+    local_action: echo hello world!
+
+# 07. Install new packages ---------------------------------------------------------------------------------------
+  - name: Install all-components.zip on Publisher
+    local_action: echo hello world!
+
+  - name: Install new jjamardo-components.zip on Publisher
+    local_action: echo hello world!
+
+# 08. Final Tasks (delete jsps, CQ stop, delete dispatcher cache, CQ start) --------------------------------------
+  - name: Delete precompiled jsps on Publisher
+    local_action: echo hello world!
+
+  - name: Clean Dispatcher Cache on Publisher
+    local_action: echo hello world!
+
+  - name: make sure CQ is stopped
+    local_action:  echo hello world!
+
+  - name: Pause for 2 minutes
+    local_action: seconds=10
+
+  - name: make sure CQ is started
+    local_action:  echo hello world!
+
+# 09. Automatic SOA Testing ----------------------------------------------------------------------------------------------------
+#tbd
+
+# 10. Remove Iptables 
+  - name:Define Iptables
+    local_action:  echo hello world!
