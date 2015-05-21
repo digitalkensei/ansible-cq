@@ -4,14 +4,14 @@
 # ===========================
 
 - name: Thesis
-  hosts: localhost
+  hosts: all
 #  user: asrun
 #  max_fail_percentage: 0
 
   tasks:
 # 01. Define Iptables --------------------------------------------------------------------------------------------
   - name:Define Iptables
-    local_action: echo hello world!
+    command: echo hello world!
 
 # 02. Delete CRX objects -----------------------------------------------------------------------------------------
   - name: Delete CRX Mappings
