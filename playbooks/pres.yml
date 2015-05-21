@@ -3,8 +3,8 @@
 # THESIS DEPLOYMENT
 # ===========================
 
-#- name: Thesis
-#  hosts: AWI_Development
+- name: Thesis
+  hosts: localhost
 #  user: asrun
 #  max_fail_percentage: 0
 
