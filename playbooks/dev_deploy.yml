@@ -70,7 +70,7 @@
 
 # 08. Final Tasks (delete jsps, CQ stop, delete dispatcher cache, CQ start) --------------------------------------
   - name: Delete precompiled jsps on Publisher
-    command: curl -X DELETE http://localhost:{{cqport}}/var/classes/org/apache/jsp/apps/ -u {{username}}:{{password}}   
+    command: curl -X DELETE http://localhost:{{cqport}}/var/classes/org/apache/jsp/apps/ -u {{username}}:{{password}}
 
   - name: Clean Dispatcher Cache on Publisher
     shell: rm -rf /opt/cq/dispatcher/cache/publish*/*

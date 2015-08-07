@@ -1,0 +1,63 @@
+# 01. Define Iptables --------------------------------------------------------------------------------------------
+# - name:Define Iptables
+#   command: sudo iptables {{wes_ips}}
+
+# 02. Upload new Hotfix into CRX -------------------------------------------------------------------------------
+  - name: Upload new hotfix1
+    shell: curl -u {{username}}:{{password}} -F package=@"/opt/cq/sources/hotfix/hotfix-hr14_1.zip" http://localhost:{{cqport}}/crx/packmgr/service/.json/?cmd=upload
+
+  - name: Upload new hotfix2
+    shell: curl -u {{username}}:{{password}} -F package=@"/opt/cq/sources/hotfix/hotfix-hr14_2.zip" http://localhost:{{cqport}}/crx/packmgr/service/.json/?cmd=upload
+
+  - name: Pause for 10 seconds
+    pause: seconds=10
+
+# 03. Install new Hotfix ----------------------------------------------------------------------------------------
+  - name: Install hotfix1
+    command: curl -u {{username}}:{{password}} -F file=@"/opt/cq/sources/hotfix/hotfix-hr14_1.zip" -F name="hotfix-hr14_1" -F force=true -F install=true http://localhost:{{cqport}}/crx/packmgr/service.jsp
+
+  - name: Pause for 60 seconds
+    pause: seconds=60
+
+  - name: Install hotfix2
+    command: curl -u {{username}}:{{password}} -F file=@"/opt/cq/sources/hotfix/hotfix-hr14_2.zip" -F name="hotfix-hr14_2" -F force=true -F install=true http://localhost:{{cqport}}/crx/packmgr/service.jsp
+
+  - name: Pause for 2 minutes
+    pause: minutes=2
+
+# 04. Final Tasks (delete jsps, CQ stop, delete dispatcher cache, CQ start) ---------------------------------------
+  - name: Check Publish path exists
+    stat: path=/opt/cq/publish/crx-quickstart
+    register: path_Publish
+
+  - name: Delete precompiled jsps on Publisher
+    command: curl -X DELETE http://localhost:{{cqport}}/var/classes/org/apache/jsp/apps/ -u {{username}}:{{password}}
+    when: path_Publish.stat.exists
+
+  - name: Clean Dispatcher Cache on Publisher
+    shell: rm -rf /opt/cq/dispatcher/cache/publish*/*
+    when: path_Publish.stat.exists
+
+  - name: Check Author path exists
+    stat: path=/opt/cq/author/crx-quickstart
+    register: path_Author
+
+  - name: Clean Author Dispatcher Cache
+    shell: rm -rf /opt/cq/dispatcher/cache/*
+    when: path_Author.stat.exists
+
+  - name: make sure CQ is stopped
+    command: /opt/cq/{{cqpath}}/crx-quickstart/bin/stop
+
+  - name: Pause for 20 seconds
+    pause: seconds=20
+
+# Fuktioniert noch nicht richtig (Server ist nicht verfuegbar wenn Ansible fertig ist)
+  - name: make sure CQ is started
+    command: nohup /opt/cq/{{cqpath}}/crx-quickstart/bin/start &
+
+# 05. Testing -----------------------------------------------------------------------------------------------------
+
+# 06. Remove Iptables 
+# - name:Define Iptables
+#   command: sudo iptables -F

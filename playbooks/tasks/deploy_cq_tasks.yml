@@ -1,0 +1,214 @@
+# DEPLOY CQ TASKS
+# ---------------
+
+# 01. Define Iptables --------------------------------------------------------------------------------------------
+  - name:Define Iptables
+    command: sudo iptables {{wes_ips}}
+
+# 02. Remove old CQ packages ------------------------------------------------------------------------------------
+  - name: Remove old all-components package
+    command: curl -u {{username}}:{{password}} -F name=all-components http://localhost:{{cqport}}/crx/packmgr/service.jsp?cmd=rm
+
+  - name: Remove old components package
+    command: curl -u {{username}}:{{password}} -F name=components http://localhost:{{cqport}}/crx/packmgr/service.jsp?cmd=rm
+
+  - name: Remove old xcomponents package
+    command: curl -u {{username}}:{{password}} -F name=xcomponents http://localhost:{{cqport}}/crx/packmgr/service.jsp?cmd=rm
+
+  - name: Remove old microsite-components package
+    command: curl -u {{username}}:{{password}} -F name=microsite-components http://localhost:{{cqport}}/crx/packmgr/service.jsp?cmd=rm
+
+  - name: Pause for 10 seconds
+    pause: seconds=10
+
+# 03. Upload new packages into CRX -------------------------------------------------------------------------------
+  - name: Upload new all-components.jar on Publisher
+    shell: curl -u {{username}}:{{password}} -F package=@"/opt/cq/sources/all-components{{version}}.jar" http://localhost:{{cqport}}/crx/packmgr/service/.json/?cmd=upload
+
+  - name: Upload new components.jar on Publisher
+    shell: curl -u {{username}}:{{password}} -F package=@"/opt/cq/sources/components-{{version}}.jar" http://localhost:{{cqport}}/crx/packmgr/service/.json/?cmd=upload
+
+  - name: Upload new xcomponents.jar on Publisher
+    shell: curl -u {{username}}:{{password}} -F package=@"/opt/cq/sources/xcomponents-{{version}}.jar" http://localhost:{{cqport}}/crx/packmgr/service/.json/?cmd=upload
+
+  - name: Upload new microsite-components.jar on Publisher
+    shell: curl -u {{username}}:{{password}} -F package=@"/opt/cq/sources/microsite-{{version}}.jar" http://localhost:{{cqport}}/crx/packmgr/service/.json/?cmd=upload
+
+  - name: Pause for 10 seconds
+    pause: seconds=10
+
+# 04. Delete CRX objects -----------------------------------------------------------------------------------------
+  - name: Delete CRX Mappings
+    command: curl -X DELETE http://localhost:{{cqport}}/etc/map -u {{username}}:{{password}}
+
+  - name: Delete CRX Mappings map-dev-publish
+    command: curl -X DELETE http://localhost:{{cqport}}/etc/map-dev-publish -u {{username}}:{{password}}
+
+  - name: Delete CRX Mappings map-int-publish
+    command: curl -X DELETE http://localhost:{{cqport}}/etc/map-int-publish -u {{username}}:{{password}}
+
+  - name: Delete CRX Mappings map-int-publish
+    command: curl -X DELETE http://localhost:{{cqport}}/etc/map-int-publish -u {{username}}:{{password}}
+
+  - name: Delete CRX Mappings map-prod-publish
+    command: curl -X DELETE http://localhost:{{cqport}}/etc/map-prod-publish -u {{username}}:{{password}}
+
+  - name: Delete CRX Mappings map-test-publish
+    command: curl -X DELETE http://localhost:{{cqport}}/etc/map-test-publish -u {{username}}:{{password}}
+
+  - name: Delete CRX Mappings map-sta-publish
+    command: curl -X DELETE http://localhost:{{cqport}}/etc/map-publish -u {{username}}:{{password}}
+
+  - name: Delete CRX Mappings map-wai-publish
+    command: curl -X DELETE http://localhost:{{cqport}}/etc/map-wai-publish -u {{username}}:{{password}}
+
+  - name: Delete CRX Mappings Launcher 
+    command: curl -X DELETE http://localhost:{{cqport}}/etc/workflow/launcher -u {{username}}:{{password}}
+
+  - name: Delete CRX Mappings Models
+    command: curl -X DELETE http://localhost:{{cqport}}/etc/workflow/models -u {{username}}:{{password}}
+
+  - name: Delete CRX Design Default
+    command: curl -X DELETE http://localhost:{{cqport}}/etc/designs/default -u {{username}}:{{password}}
+
+  - name: Delete CRX Design Cargo
+    command: curl -X DELETE http://localhost:{{cqport}}/etc/designs -u {{username}}:{{password}}
+
+# Delete CRX Clientlibs darf nicht durchgefuehrt werden, da Info nicht ueber diesen Job deployt wird                           
+
+  - name: Delete CRX Mappings Global
+    command: curl -X DELETE http://localhost:{{cqport}}/apps/global -u {{username}}:{{password}}
+
+  - name: Pause for 5 seconds
+    pause: seconds=5
+
+  - name: Delete CRX Mappings Config (problem delete and write mappings)
+    command: curl -X DELETE http://localhost:{{cqport}}/apps/system/config -u {{username}}:{{password}}
+
+  - name: Pause for 10 seconds
+    pause: seconds=10
+
+  - name: Add CRX Mappings Config
+    command: curl http://localhost:{{cqport}}/apps/system/config -Fjcr:primaryType=sling:Folder -u {{username}}:{{password}}
+
+  - name: Pause for 5 seconds
+    pause: seconds=5
+
+# 05. Remove Folder / Files on Server ----------------------------------------------------------------------------
+  - name: Remove Namics folder
+    shell: rm -rf /opt/cq/{{cqpath}}/crx-quickstart/launchpad/config/com/namics
+
+  - name: Remove Impl folder
+    shell: rm -rf /opt/cq/{{cqpath}}/crx-quickstart/launchpad/config/com/day/cq/rewriter/linkchecker/impl
+
+  - name: Check BlogSearchPingServiceImpl path exists
+    stat: path=/opt/cq/{{cqpath}}/crx-quickstart/launchpad/config/com/day/cq/collab/blog/search/impl/BlogSearchPingServiceImpl.config
+    register: path_BlogSearchPingServiceImpl
+
+  - name: Remove BlogSearchPingServiceImpl.config
+    shell: rm /opt/cq/{{cqpath}}/crx-quickstart/launchpad/config/com/day/cq/collab/blog/search/impl/BlogSearchPingServiceImpl.config
+    when: path_BlogSearchPingServiceImpl.stat.exists
+
+  - name: Check AssetSynchronizationService path exists
+    stat: path=/opt/cq/{{cqpath}}/crx-quickstart/launchpad/config/com/day/cq/dam/core/impl/sync/AssetSynchronizationService.config
+    register: path_AssetSynchronizationService
+
+  - name: Remove AssetSynchronizationService.config
+    shell: rm /opt/cq/{{cqpath}}/crx-quickstart/launchpad/config/com/day/cq/dam/core/impl/sync/AssetSynchronizationService.config
+    when: path_AssetSynchronizationService.stat.exists
+
+  - name: Check HtmlLibraryManagerImpl path exists
+    stat: path=/opt/cq/{{cqpath}}/crx-quickstart/launchpad/config/com/day/cq/widget/impl/HtmlLibraryManagerImpl.config
+    register: path_HtmlLibraryManagerImpl
+
+  - name: Remove HtmlLibraryManagerImpl.config
+    shell: rm /opt/cq/{{cqpath}}/crx-quickstart/launchpad/config/com/day/cq/widget/impl/HtmlLibraryManagerImpl.config
+    when: path_HtmlLibraryManagerImpl.stat.exists
+
+  - name: Check SlingServletResolver path exists
+    stat: path=/opt/cq/{{cqpath}}/crx-quickstart/launchpad/config/org/apache/sling/servlets/resolver/SlingServletResolver.config
+    register: path_SlingServletResolver
+
+  - name: Remove SlingServletResolver.config
+    shell: rm /opt/cq/{{cqpath}}/crx-quickstart/launchpad/config/org/apache/sling/servlets/resolver/SlingServletResolver.config
+    when: path_SlingServletResolver.stat.exists
+
+# Problem: wenn dies geloescht wird kann Seite nicht aufgeloest werden
+#  - name: Check JcrResourceResolverFactoryImpl path exists
+#    stat: path=/opt/cq/{{cqpath}}/crx-quickstart/launchpad/config/org/apache/sling/jcr/resource/internal/JcrResourceResolverFactoryImpl.config
+#    register: check_path_JcrResourceResolverFactoryImpl
+# 
+#  - name: Remove JcrResourceResolverFactoryImpl.config
+#    shell: rm /opt/cq/{{cqpath}}/crx-quickstart/launchpad/config/org/apache/sling/jcr/resource/internal/JcrResourceResolverFactoryImpl.config
+#    when: check_path_JcrResourceResolverFactoryImpl.stat.exists
+
+# 06.1. Remove Folder / Files on Publish Server -------------------------------------------------------------------
+  - name: Check if publish DefaultMailService path exists
+    stat: path=/opt/cq/publish/crx-quickstart/launchpad/config/com/day/cq/mailer/DefaultMailService.config
+    register: path_DefaultMailService
+
+  - name: Remove DefaultMailService.config
+    shell: rm /opt/cq/publish/crx-quickstart/launchpad/config/com/day/cq/mailer/DefaultMailService.config
+    when: path_DefaultMailService.stat.exists
+
+# Problem: wenn dies geloescht wird kann Seite nicht aufgeloest werden
+#  - name: Check if publish JcrResourceResolverFactoryImpl path exists
+#    stat: path=/opt/cq/publish/crx-quickstart/launchpad/config/org/apache/sling/jcr/resource/internal/JcrResourceResolverFactoryImpl.config
+#    register: check_path_JcrResourceResolverFactoryImpl
+# 
+#  - name: Remove JcrResourceResolverFactoryImpl.config
+#    shell: rm /opt/cq/publish/crx-quickstart/launchpad/config/org/apache/sling/jcr/resource/internal/JcrResourceResolverFactoryImpl.config
+#    when: check_path_JcrResourceResolverFactoryImpl.stat.exists
+
+  - name: Check if publish ReferrerFilter path exists
+    stat: path=/opt/cq/publish/crx-quickstart/launchpad/config/org/apache/sling/security/impl/ReferrerFilter.config
+    register: path_ReferrerFilter
+
+  - name: Remove ReferrerFilter.config
+    shell: rm /opt/cq/publish/crx-quickstart/launchpad/config/org/apache/sling/security/impl/ReferrerFilter.config
+    when: path_ReferrerFilter.stat.exists
+
+  - name: Check if publish DefaultGetServlet path exists
+    stat: path=/opt/cq/publish/crx-quickstart/launchpad/config/org.apache/sling/servlets/get/DefaultGetServlet.config
+    register: path_DefaultGetServlet
+
+  - name: Remove DefaultGetServlet.config
+    shell: rm /opt/cq/publish/crx-quickstart/launchpad/config/org.apache/sling/servlets/get/DefaultGetServlet.config
+    when: path_DefaultGetServlet.stat.exists
+
+# 06.2. Remove Folder / Files on Author Server --------------------------------------------------------------------
+
+# 07. Install new packages ----------------------------------------------------------------------------------------
+  - name: Pause for 5 seconds
+    pause: seconds=5
+
+  - name: Install all-components.zip on Publisher
+    command: curl -u {{username}}:{{password}} -F file=@"/opt/cq/sources/all-{{version}}.jar" -F name="all-components" -F force=true -F install=true http://localhost:{{cqport}}/crx/packmgr/service.jsp
+
+  - name: Pause for 60 seconds
+    pause: seconds=60
+
+  - name: Install new components.zip on Publisher
+    command: curl -u {{username}}:{{password}} -F file=@"/opt/cq/sources/components-{{version}}.jar" -F name="components" -F force=true -F install=true http://localhost:{{cqport}}/crx/packmgr/service.jsp
+
+  - name: Pause for 30 seconds
+    pause: seconds=30
+
+  - name: Install new xcomponents.zip on Publisher
+    command: curl -u {{username}}:{{password}} -F file=@"/opt/cq/sources/xcomponents-{{version}}.jar" -F name="xcomponents" -F force=true -F install=true http://localhost:{{cqport}}/crx/packmgr/service.jsp
+
+  - name: Pause for 30 seconds
+    pause: seconds=30
+
+  - name: Install new microsite-components.zip on Publisher
+    command: curl -u {{username}}:{{password}} -F file=@"/opt/cq/sources/microsite-{{version}}.jar" -F name="microsite-components" -F force=true -F install=true http://localhost:{{cqport}}/crx/packmgr/service.jsp
+
+  - name: Pause for 2 minutes
+    pause: minutes=2
+
+# 09. Testing -----------------------------------------------------------------------------------------------------
+# Not yet defined
+
+# 10. Remove Iptables 
+# - name:Define Iptables
+#   command: sudo iptables -F

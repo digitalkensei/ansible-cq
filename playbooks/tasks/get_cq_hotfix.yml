@@ -1,0 +1,6 @@
+# 01. Copy hotfix packages from ftp.sbb.ch to /opt/cq/sources/ -----------------------------------------------------------------------
+  - name: Copy hotfix-hr14_1.zip
+    command: wget -O /opt/cq/sources/hotfix/hotfix-hr14_1.zip --user=*** --password='***' ftp://jjamardo.com/2015-int-r01-fr/hotfix-hr14_1.zip
+
+  - name: Copy hotfix-hr14_2.zip
+    command: wget -O /opt/cq/sources/hotfix/hotfix-hr14_2.zip --user=*** --password='***' ftp://jjamardo.com/2015-int-r01-fr/hotfix-hr14_2.zip

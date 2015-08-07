@@ -1,0 +1,29 @@
+---
+# File: copy_all_publish_config.yml
+#
+# Description: Copy all Git config files 
+#
+# Parameters: 
+# - {{ gitfolder }}: Git Project Folder 
+# ===========================
+
+- name: Copy all Publish Git config files 
+  hosts: "{{server}}"
+  user: asrun
+
+  tasks:
+
+  - name: Apache stop
+    command: sudo /etc/init.d/httpd stop
+
+  - name: Copy global httpd config
+    copy: src=/var/lib/awx/projects/{{gitfolder}}/conf_publish/vhosts/glob/ dest=/etc/httpd/conf/vhosts/glob/ owner=asrun group=asrun mode=0644
+
+  - name: Copy global dispatcher config
+    copy: src=/var/lib/awx/projects/{{gitfolder}}/conf_publish/disp/glob/ dest=/etc/httpd/conf/disp/glob/ owner=asrun group=asrun mode=0644
+
+  - name: Copy httpd base config
+    copy: src=/var/lib/awx/projects/{{gitfolder}}/conf_publish/httpd.conf dest=/etc/httpd/conf/ owner=asrun group=asrun mode=0644
+
+  - name: Apache start
+    command: sudo /etc/init.d/httpd start

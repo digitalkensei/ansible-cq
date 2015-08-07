@@ -1,0 +1,48 @@
+---
+
+# CQ SNAPSHOT DEPLOYMENT
+# ========================================
+
+- name: CQ Snapshot Deployment
+  hosts: "{{devserver}}"
+  user: asrun
+  max_fail_percentage: 0
+  serial: 1
+
+  tasks:
+
+# Send e-mail to xit512
+  - local_action: mail
+                  host='127.0.0.1'
+                  port=25
+                  subject="Ansible Start Dev Deployment "{{cqpath}}""
+                  body="Beginn DEV Deployment "{{cqpath}}" Version "{{version}}""
+                  from="ansible@sbb.ch (Ansible Notify)"
+                  to="<hello@sbb.ch>"
+                  charset=utf8
+
+# 01. Get CQ Snapshot Files --------------------------------------------------------------------------------------------
+  - name: Get CQ Snapshot Files
+    include: tasks/get_cq_snapshot.yml
+
+# 02. Include CQ Deployment Tasks ------------------------------------------------------------------------
+  - name: CQ Deployment Tasks
+    include: tasks/deploy_cq_tasks.yml
+
+# 03. Include CQ Delete JSP and Dispatcher Tasks ------------------------------------------------------------------------
+  - name: Delete JSP and Dispatcher
+    include: tasks/delete_jsp_and_dispatcher_cache.yml
+
+# 04. Include CQ Restart Tasks ------------------------------------------------------------------------
+  - name: CQ Restart Tasks
+    include: tasks/restart_cq.yml
+
+# Send e-mail to xit512
+  - local_action: mail
+                  host='127.0.0.1'
+                  port=25
+                  subject="Ansible End Dev Deployment "{{cqpath}}""
+                  body="Ende DEV Deployment "{{cqpath}}" Version "{{version}}""
+                  from="ansible@sbb.ch (Ansible Notify)"
+                  to="<hello@sbb.ch>"
+                  charset=utf8

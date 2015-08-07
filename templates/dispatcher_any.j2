@@ -1,0 +1,30 @@
+/{{ project }}
+    {
+                # hostname globbing for farm selection (virtual domain addressing)
+                /virtualhosts
+                {
+                  "{{env}}{{vhost}}"
+                }
+                /homepage "/"
+                /propagateSyndPost "0"
+                /cache
+                {
+                  /docroot "/opt/daycq/dispatcher/cache/{{ project }}"
+                  /statfileslevel "0"
+                  $include "/etc/httpd/conf/disp/glob/dispatcher_publish_cache.any"
+                }
+                $include "/etc/httpd/conf/disp/glob/dispatcher_publish_config.any"
+
+                # Authorization checker: before a page in the cache is delivered, a HEAD
+                # request is sent to the URL specified in 'url' with the query string
+                # '?uri=<page>'. If the response status is 200 (OK), the page is returned
+                # from the cache. Otherwise, the request is forwarded to the render and
+                # its response returned.
+                # Authorization checker
+                /auth_checker
+                  {
+                  /url "http://{{env}}{{vhost}}/bin/permissioncheck.html"
+
+                $include "/etc/httpd/conf/disp/authorize/{{vhost}}_farm_authorize.any"
+            }
+    }

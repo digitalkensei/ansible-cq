@@ -1,0 +1,56 @@
+---
+
+# File: config_add.yml
+#
+# Description: Create a new virtual host 
+#
+# Parameters: 
+# - {{ project }} : absolute docroot path 
+# - {{ vhost }} : virtualhost name 
+# - {{ directaccess }}: Creates a second vhost entry for administration
+# - {{ gitfolder }}: Git Project Folder 
+# ===========================
+
+- name: Add new VirtualHost
+  hosts: "{{server}}"
+  user: asrun
+
+  tasks:
+
+  - name: Apache stop
+    command: sudo /etc/init.d/httpd stop
+
+  - name: Copy httpd param config
+    copy: src=/var/lib/awx/projects/{{gitfolder}}/conf_publish/vhosts/{{vhost}}_vhost.conf dest=/etc/httpd/conf/vhosts/ owner=asrun group=asrun mode=0644
+
+  - name: Copy httpd type param config
+    copy: src=/var/lib/awx/projects/{{gitfolder}}/conf_publish/vhosts/{{vhost}}_vhost_direct.conf dest=/etc/httpd/conf/vhosts/ owner=asrun group=asrun mode=0644
+
+  - name: Copy dispatcher param config
+    copy: src=/var/lib/awx/projects/{{gitfolder}}/conf_publish/disp/authorize/{{vhost}}_farm_authorize.any dest=/etc/httpd/conf/disp/authorize/ owner=asrun group=asrun mode=0644
+
+  - name: Create DocumentRoot directory
+    file: path=/opt/cq/dispatcher/cache/{{project}} state=directory owner=asrun group=asrun mode=0775
+
+  - name: Create VirtualHost entry 
+    template:
+      src=/var/lib/awx/projects/{{gitfolder}}/templates/virtualhost.j2
+      dest=/etc/httpd/sites-available/{{ vhost }}.conf
+
+  - name: Create Dispatcher Any entry
+    template:
+      src=/var/lib/awx/projects/{{gitfolder}}/templates/dispatcher_any.j2
+      dest=/etc/httpd/conf/disp/farm/{{vhost}}_disp_farm.any
+
+  - name: Enable Virtualhost entry 
+    command: /usr/local/bin/enable-site {{ vhost }}
+
+  - name: Add /etc/hosts entry
+    lineinfile: >
+      state=present
+      dest=/etc/hosts
+      line="127.0.0.1    {{vhost}} #ansible_config"
+      insertafter=EOF
+
+  - name: Apache start
+    command: sudo /etc/init.d/httpd start

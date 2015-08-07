@@ -1,0 +1,24 @@
+---
+
+# CQ RELEASE DEPLOYMENT
+# ========================================
+
+- name: CQ Deployment {{release}}
+  hosts: "{{server}}"
+  user: asrun
+  max_fail_percentage: 0
+  serial: 1
+
+  tasks:
+
+# 01. Include CQ Deployment Tasks ---------------------------------------------------------------------
+  - name: CQ Deployment Tasks
+    include: tasks/deploy_cq_tasks.yml
+
+# 02. Include CQ Delete JSP and Dispatcher Tasks ------------------------------------------------------
+  - name: Delete JSP and Dispatcher
+    include: tasks/delete_jsp_and_dispatcher_cache.yml
+
+# 03. Include CQ Restart Tasks ------------------------------------------------------------------------
+  - name: CQ Restart Tasks
+    include: tasks/restart_cq.yml

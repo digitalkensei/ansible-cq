@@ -1,0 +1,9 @@
+# Send e-mail to a bunch of users, attaching files
+  - local_action: mail
+                  host='127.0.0.1'
+                  port=25
+                  subject="Ansible Success"
+                  body="Succesful "{{env}}" Deployment Version "{{version}}" Server "{{server}}""
+                  from="ansible@sbb.ch (Ansible Notify)"
+                  to="El tio Juli <test@jjamardo.com>"
+                  charset=utf8

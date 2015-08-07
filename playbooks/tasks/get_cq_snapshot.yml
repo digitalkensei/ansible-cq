@@ -1,0 +1,15 @@
+# GET CQ SNAPSHOT
+# ---------------
+
+# 01. Copy new dev packages from jjamardo.com to /opt/cq/sources/ -----------------------------------------------------------------------
+  - name: Copy new sbb-all-components.zip
+    command: wget -O /opt/cq/sources/sbball-LATEST.jar http://jjamardo.com/service/local/artifact/maven/redirect?r=mirror\&g=com.namics.cq.sbb.wcms\&a=sbb-all-components\&v=LATEST
+
+  - name: Copy new sbb-onesbb-components.zip
+    command: wget -O /opt/cq/sources/onesbb-LATEST.jar http://jjamardo.com/service/local/artifact/maven/redirect?r=mirror\&g=com.namics.cq.sbb.wcms\&a=sbb-onesbb-components\&v=LATEST
+
+  - name: Copy news sbb-cargo-components.zip
+    command: wget -O /opt/cq/sources/sbbcargo-LATEST.jar http://jjamardo.com/service/local/artifact/maven/redirect?r=mirror\&g=com.namics.cq.sbb.wcms\&a=sbb-cargo-components\&v=LATEST
+
+  - name: Copy new sbb-microsite-components.zip
+    command: wget -O /opt/cq/sources/microsite-LATEST.jar http://jjamardo.com/service/local/artifact/maven/redirect?r=mirror\&g=com.namics.cq.sbb.wcms\&a=sbb-microsite-components\&v=LATEST

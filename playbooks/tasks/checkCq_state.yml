@@ -1,0 +1,26 @@
+# Check CQ State
+# ---------------
+#action: uri url=http://localhost:{{cqport}}/bin/sbb/checkServlet.json?getRootBundle user={{username}} password={{password}}  HEADER_Content-Type="application/json" body_format=json return_content=yes
+#command: curl -f -k -X GET -u {{username}}:{{password}} http://localhost:{{cqport}}/bin/sbb/checkServlet.json?getRootBundle  
+
+  - name: Pause for 20 seconds for Checking CQ State
+    pause: seconds=10
+
+  - name: Check State of Root Bundle
+    action: uri url=http://localhost:{{cqport}}/bin/jjamardo.com/checkServlet.json?getRootBundle user={{username}} password={{password}}  HEADER_Content-Type="application/json" body_format=json return_content=yes
+    register: webpageA
+    until: webpageA.content == "ACTIVE"
+    retries: 50
+    delay: 15
+    when: cqport == 4502
+
+  - name: Pause for 20 seconds for Checking CQ State 2
+    pause: seconds=10
+
+  - name: Check State of Root Bundle
+    shell: curl -u {{username}}:{{password}} -H Content-Type:application/json -X GET http://localhost:{{cqport}}/bin/sbb/checkServlet.json?getRootBundle
+    register: webpageP
+    until: webpageP.content == "ACTIVE"
+    retries: 50
+    delay: 15
+    when: cqport == 4503

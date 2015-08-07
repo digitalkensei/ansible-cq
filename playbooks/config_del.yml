@@ -1,0 +1,30 @@
+---
+
+# File: config_del.yml
+#
+# Description: Delete virtual host 
+#
+# Parameters: 
+# - {{ project }} : absolute docroot path 
+# - {{ vhost }} : virtualhost name 
+# ===========================
+
+- name: Delete Vhost
+  hosts: "{{server}}"
+  user: asrun
+
+  tasks:
+  - name: Disable Virtualhost entry | Remove Symlink
+    command: /usr/local/bin/disable-site {{vhost}}
+
+  - name: Apache | Virtualhost delete | Remove virtual host file
+    file: path=/etc/httpd/sites-available/{{vhost}}.conf state=absent
+
+  - name: Apache | Remove cache folder
+    command: rm -rf /opt/daycq/dispatcher/cache/{{project}}
+
+  - name: remove /etc/hosts entry
+    lineinfile: dest=/etc/hosts state=absent regexp="{{vhost}}"
+
+  - name: Apache restart
+    command: sudo /etc/init.d/httpd restart

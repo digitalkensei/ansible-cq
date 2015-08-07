@@ -1,0 +1,23 @@
+# DELETE JSP AND DISPATCHER CACHE
+# -------------------------------
+
+# Final Tasks (delete jsps, delete dispatcher cache) ---------------------------------------
+  - name: Check Publish path exists
+    stat: path=/opt/cq/publish/crx-quickstart
+    register: path_Publish
+
+  - name: Delete precompiled jsps on Publisher
+    command: curl -X DELETE http://localhost:{{cqport}}/var/classes/org/apache/jsp/apps/ -u {{username}}:{{password}}
+    when: path_Publish.stat.exists
+
+  - name: Clean Dispatcher Cache on Publisher
+    shell: rm -rf /opt/cq/dispatcher/cache/publish*/*
+    when: path_Publish.stat.exists
+
+  - name: Check Author path exists
+    stat: path=/opt/cq/author/crx-quickstart
+    register: path_Author
+
+  - name: Clean Author Dispatcher Cache
+    shell: rm -rf /opt/cq/dispatcher/cache/*
+    when: path_Author.stat.exists

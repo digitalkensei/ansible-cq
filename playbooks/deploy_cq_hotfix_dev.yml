@@ -1,0 +1,20 @@
+---
+
+# CQ HOTFIX DEPLOYMENT
+# ========================================
+
+- name: CQ Hotfix Deployment
+  hosts: "{{devserver}}"
+  user: asrun
+  max_fail_percentage: 0
+  serial: 1
+
+  tasks:
+
+# 01. Get CQ Hotfix Files --------------------------------------------------------------------------------------------
+  - name: Get CQ Hotfix Files
+    include: tasks/get_cq_hotfix.yml
+
+# 02. Include CQ Hotfix Deployment Tasks ------------------------------------------------------------------------
+  - name: CQ Hotfix Deployment Tasks
+    include: tasks/deploy_cq_hotfix_tasks.yml

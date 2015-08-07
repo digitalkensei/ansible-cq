@@ -1,0 +1,46 @@
+# --------------------{ {{ env }}{{ vhost }} }--------------------
+<VirtualHost *:{{vhostport}}>
+  ServerName {{ env }}{{ vhost }}
+  DocumentRoot /opt/cq/dispatcher/cache/{{ project }}
+  ErrorLog /opt/cq/logs/httpd/{{ project }}-error.log
+  CustomLog /opt/cq/logs/httpd/{{ project }}-access.log combined
+  RequestHeader set Host {{ env }}{{ vhost }}
+
+    <IfModule disp_apache2.c>
+                SetHandler dispatcher-handler
+    </IfModule>
+
+  #Include /etc/httpd/conf/vhosts/glob/error-global.conf
+
+#Vhost config include
+  Include /etc/httpd/conf/vhosts/{{vhost}}_vhost.conf
+
+ <Directory /opt/cq/dispatcher/cache/{{ project }}>
+    Include /etc/httpd/conf/vhosts/glob/directory.conf
+ </Directory>
+
+</VirtualHost>
+
+
+# --------------------{ DirectAccess - {{ env }}{{ vhost }} }--------------------
+<VirtualHost *:{{vhostport}}>
+  ServerName {{direct}}{{ env }}{{ vhost }}
+  DocumentRoot /opt/cq/dispatcher/cache/{{project}}
+  ErrorLog /opt/cq/logs/httpd/{{ project }}-error.log
+  CustomLog /opt/cq/logs/httpd/{{ project }}-access.log combined
+  RequestHeader set Host {{ env }}{{ vhost }}
+
+    <IfModule disp_apache2.c>
+                SetHandler dispatcher-handler
+    </IfModule>
+
+  #Include /etc/httpd/conf/vhosts/glob/error-global.conf
+
+#Direct access Vhost config include
+  Include /etc/httpd/conf/vhosts/{{vhost}}_vhost_direct.conf
+
+ <Directory /opt/cq/dispatcher/cache/{{ project }}>
+    Include /etc/httpd/conf/vhosts/glob/directory.conf
+ </Directory>
+
+</VirtualHost>

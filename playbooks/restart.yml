@@ -1,0 +1,23 @@
+---
+
+# STOP AND START
+# ===========================
+
+- name: Nightly Deliver Deployment (LATEST)
+  hosts: AEM_Dev
+  user: asrun
+  max_fail_percentage: 0
+  serial: 1
+
+  tasks:
+
+# 08. Final Tasks (delete jsps, CQ stop, delete dispatcher cache, CQ start) --------------------------------------
+
+  - name: make sure CQ is stopped
+    command: /opt/cq/{{cqpath}}/crx-quickstart/bin/stop
+
+  - name: Pause for 1 minute
+    pause: minutes=1
+
+  - name: Start of CQ instance 
+    command: nohup /opt/cq/{{cqpath}}/crx-quickstart/bin/start &

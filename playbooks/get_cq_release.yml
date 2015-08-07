@@ -1,0 +1,23 @@
+---
+
+# GET CQ RELEASE FILES
+# ========================================
+
+- name: Get CQ Release Files | {{release}}
+  hosts: "{{server}}"
+  user: asrun
+  max_fail_percentage: 0
+
+  tasks:
+
+  - name: Get sbb-all release files
+    command: wget -O /opt/cq/sources/sbball-{{version}}.jar http://jjamardo.com/service/local/repositories/hosted.wcms.releases/content/com/cq/wcms/jjamardo-all-components/{{version}}/jjamardo-all-components-{{version}}-crx-package.jar
+
+  - name: Get onesbb release files
+    command: wget -O /opt/cq/sources/components-{{version}}.jar http://jjamardo.com/service/local/repositories/hosted.wcms.releases/content/com/cq/wcms/jjamardo-components/{{version}}/jjamardo-components-{{version}}-crx-package.jar
+
+  - name: Get sbb-cargo release files
+    command: wget -O /opt/cq/sources/xcomponents-{{version}}.jar http://jjamardo.com/service/local/repositories/hosted.wcms.releases/content/com/cq/wcms/jjamardo-xcomponents/{{version}}/jjamardo-xcomponents-{{version}}-crx-package.jar
+
+  - name: Get microsite release files
+    command: wget -O /opt/cq/sources/microsite-{{version}}.jar http://jjamardo.com/service/local/repositories/hosted.wcms.releases/content/com/cq/wcms/jjamardo-microsite-components/{{version}}/jjamardo-microsite-components-{{version}}-crx-package.jar

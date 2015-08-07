@@ -1,0 +1,12 @@
+# RESTART CQ
+# ----------
+
+  - name: make sure CQ is stopped
+    command: /opt/cq/{{cqpath}}/crx-quickstart/bin/stop
+
+  - name: Pause for 20 seconds
+    pause: seconds=20
+
+# Fuktioniert noch nicht richtig (Server ist nicht verfuegbar wenn Ansible fertig ist)
+  - name: make sure CQ is started
+    command: nohup /opt/cq/{{cqpath}}/crx-quickstart/bin/start &

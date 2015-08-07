@@ -1,0 +1,26 @@
+---
+# File: copy_all_author_config.yml
+#
+# Description: Copy all Git config files 
+#
+# Parameters: 
+# - {{ gitfolder }}: Git Project Folder 
+# ===========================
+
+- name: Copy all Author Git config files 
+  hosts: "{{server}}"
+  user: asrun
+
+  tasks:
+
+  - name: Apache stop
+    command: sudo /etc/init.d/httpd stop
+
+  - name: Copy global dispatcher config
+    copy: src=/var/lib/awx/projects/{{gitfolder}}/conf_author/disp/glob/ dest=/etc/httpd/conf/disp/glob/ owner=asrun group=asrun mode=0644
+
+  - name: Copy httpd base config
+    copy: src=/var/lib/awx/projects/{{gitfolder}}/conf_author/httpd.conf dest=/etc/httpd/conf/ owner=asrun group=asrun mode=0644
+
+  - name: Apache start
+    command: sudo /etc/init.d/httpd start
